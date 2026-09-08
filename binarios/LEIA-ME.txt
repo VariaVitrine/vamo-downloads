@@ -1,0 +1,2 @@
+Placeholders que o CI sobrescreve com os binários reais.
+Suba vamo.apk e/ou vamo.ipa reais e o workflow publica no Release latest.

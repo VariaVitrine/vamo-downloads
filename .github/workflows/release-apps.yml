@@ -1,0 +1,30 @@
+name: release-apps
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "vamo.apk"
+      - "vamo.ipa"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publica/atualiza release "latest" com os binários
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "VAMO app — latest"
+          prerelease: false
+          files: |
+            vamo.apk
+            vamo.ipa
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
