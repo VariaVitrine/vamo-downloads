@@ -13,8 +13,7 @@ export default function handler(req, res) {
     return;
   }
   // POST: repassa pra máquina do dono via serviço de túnel público
-  const backend = process.env.VAMO_TUNNEL_URL || 'http://localhost:3002';
-  let body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body ?? {});
+  const backend = process.env.VAMO_TUNNEL_URL || 'https://riders-yards-standard-floating.trycloudflare.com';  let body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body ?? {});
   globalThis.__VAMO_LAST_WA__ = new Date().toISOString() + '\n' + body.slice(0, 2000);
   fetch(backend + '/webhook/whatsapp', {
     method: 'POST',
