@@ -1,13 +1,13 @@
 // Relay webhook WhatsApp Cloud API — captura TODOS os eventos (status de entrega, erros).
-// GET  /  → responde o desafio de verificação da Meta (hub.challenge)
-// POST /  → recebe eventos; guarda o último na memória do lambda
-// GET /?debug=1 → mostra o último evento bruto (pra eu ler o código de erro real)
-module.exports = (req, res) => {
+// GET  /            → desafio de verificação da Meta (hub.challenge)
+// GET  /?debug=1    → mostra o último evento bruto (código de erro real)
+// POST /            → recebe eventos da Meta
+export default function handler(req, res) {
   if (req.method === 'GET') {
     const u = new URL(req.url, 'http://x');
     if (u.searchParams.get('debug') === '1') {
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      res.status(200).send(global.__VAMO_LAST_EVENT__ || 'nenhum evento recebido ainda');
+      res.status(200).send(globalThis.__VAMO_LAST_EVENT__ || 'nenhum evento recebido ainda');
       return;
     }
     const mode = u.searchParams.get('hub.mode');
@@ -17,14 +17,15 @@ module.exports = (req, res) => {
       res.status(200).send(challenge);
       return;
     }
-    res.sendStatus(403);
+    res.status(403).send('forbidden');
     return;
   }
-  // POST: evento
-  let body = '';
-  req.on('data', (c) => { body += c; });
-  req.on('end', () => {
-    global.__VAMO_LAST_EVENT__ = new Date().toISOString() + '\n' + body;
-    res.sendStatus(200);
-  });
-};
+  // POST — body já vem parseado no runtime da Vercel
+  try {
+    const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body ?? {});
+    globalThis.__VAMO_LAST_EVENT__ = new Date().toISOString() + '\n' + body;
+    res.status(200).send('EVENT_RECEIVED');
+  } catch (e) {
+    res.status(200).send('EVENT_RECEIVED');
+  }
+}
