@@ -2,28 +2,279 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>📲 Baixar VAMO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Baixar o VAMO</title>
+<meta name="description" content="O VAMO no seu celular: app Android, TestFlight no iOS, ou o PWA que instala direto do navegador.">
+<meta name="theme-color" content="#FFF9F0">
+<meta name="color-scheme" content="light">
+
+<!--
+  ═══════════════════════════════════════════════════════════════
+  PÁGINA DE DOWNLOAD — VAMO · Polaroid Festa
+  ───────────────────────────────────────────────────────────────
+  Esta página nasceu com a identidade APOSENTADA: fundo azul-escuro
+  #0b1020, botão verde, emoji no título. Nada disso existe no
+  DESIGN.md.
+
+  Agora ela obedece à regra de ferro: duas cores (cobalto e rosa)
+  sobre o chão creme, tipografia por escala e peso, zero terceira
+  matiz. É a mesma página que o CI do `deploy-dl` publica.
+
+  Página única, sem build: o `deploy-dl` tem repo git próprio e CI
+  de release, então um arquivo só é a escolha certa aqui — não vale
+  puxar uma toolchain para servir um cartão de download.
+  ═══════════════════════════════════════════════════════════════
+-->
+
+<link rel="icon" href="/icone-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
 <style>
-  body{font-family:system-ui,-apple-system,sans-serif;background:#0b1020;color:#fff;margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center}
-  .card{max-width:420px;padding:40px 24px}
-  h1{font-size:28px;margin:0 0 8px}
-  p.sub{color:#9aa3b2;margin:0 0 28px}
-  a.btn{display:block;margin:12px auto;padding:16px 20px;border-radius:14px;font-weight:700;font-size:17px;text-decoration:none;max-width:320px}
-  .apk{background:#22c55e;color:#04220f}
-  .ipa{background:#e5e7eb;color:#111}
-  .bot{background:transparent;color:#9aa3b2;border:1px solid #2a3350}
-  small{color:#6b7280;display:block;margin-top:24px}
+  /* ── Tokens do DESIGN.md, inline (página autocontida) ───────── */
+  :root{
+    --primary:#1d4ed8;      /* cobalto — estrutura */
+    --party:#ec4899;        /* rosa — festa */
+    --paper:#fff9f0;        /* creme — o chão */
+    --ink:#141210;          /* tinta quente */
+    --muted:#6b7280;
+    --polaroid:#ffffff;
+    --linha:#eadfd0;
+    --sombra:0 8px 24px rgba(20,18,16,.10);
+    --sombra-lift:0 16px 40px rgba(20,18,16,.14);
+    --ease:cubic-bezier(.22,1,.36,1);
+    --fonte-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --fonte-mono:'Space Mono',ui-monospace,SFMono-Regular,monospace;
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    min-height:100dvh;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+  }
+
+  .folha{
+    width:100%;
+    max-width:480px;
+    background:var(--polaroid);
+    border-radius:20px;
+    box-shadow:var(--sombra);
+    padding:36px 28px 32px;
+    position:relative;
+  }
+
+  /* Fita adesiva: o detalhe que faz ler como colado no mural. */
+  .folha::before{
+    content:"";
+    position:absolute;
+    top:-9px;
+    left:50%;
+    width:76px;
+    height:18px;
+    transform:translateX(-50%) rotate(-1.5deg);
+    background:rgba(255,255,255,.7);
+    border-radius:2px;
+    box-shadow:0 1px 3px rgba(20,18,16,.14);
+  }
+
+  .marca{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--fonte-mono);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:20px;
+  }
+
+  /* A gosminha: corpo com gradiente e dois olhos de feijão.
+     Os olhos são pseudo-elementos do MESMO bloco — por construção,
+     não têm como descolar do corpo. */
+  .gosma{
+    width:26px;height:26px;
+    border-radius:50%;
+    background:radial-gradient(circle at 36% 30%,#ffd6e6 0%,#ff8fb8 52%,#d5497c 100%);
+    position:relative;
+    flex-shrink:0;
+    animation:respira 3.4s var(--ease) infinite;
+  }
+  .gosma::before,.gosma::after{
+    content:"";
+    position:absolute;
+    top:40%;
+    width:2.6px;height:4px;
+    border-radius:50%;
+    background:var(--ink);
+  }
+  .gosma::before{left:30%}
+  .gosma::after{right:30%}
+
+  @keyframes respira{
+    0%,100%{transform:scale(1,1)}
+    50%{transform:scale(1.05,.95)}
+  }
+
+  h1{
+    font-family:var(--fonte-display);
+    font-size:clamp(28px,7vw,38px);
+    font-weight:700;
+    letter-spacing:-.035em;
+    line-height:1.02;
+    margin:0 0 10px;
+  }
+
+  .sub{
+    color:var(--muted);
+    font-size:16px;
+    line-height:1.55;
+    margin:0 0 28px;
+    max-width:38ch;
+  }
+
+  .opcoes{display:grid;gap:10px}
+
+  /* ── Botões ──────────────────────────────────────────────────
+     Squish com volume preservado no :active — o mesmo princípio do
+     corpo mole. Escala x e y em proporção inversa ao encolher. */
+  a.btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:17px 22px;
+    border-radius:9999px;
+    font-family:var(--fonte-mono);
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    transition:transform .16s var(--ease),background-color .16s var(--ease),box-shadow .16s var(--ease);
+    border:1px solid transparent;
+  }
+  a.btn:active{transform:scale(1.04,.92)}
+
+  .principal{
+    background:var(--party);
+    color:#fff;
+    box-shadow:var(--sombra);
+  }
+  .principal:hover{background:#be185d;transform:translateY(-2px);box-shadow:var(--sombra-lift)}
+
+  .secundario{
+    background:var(--primary);
+    color:#fff;
+  }
+  .secundario:hover{background:#1e40af;transform:translateY(-2px);box-shadow:var(--sombra-lift)}
+
+  .fantasma{
+    background:transparent;
+    color:var(--muted);
+    border-color:var(--linha);
+  }
+  .fantasma:hover{color:var(--ink);border-color:var(--ink)}
+
+  /* ── Selo de recomendação ────────────────────────────────── */
+  .selo{
+    display:inline-block;
+    transform:rotate(-3deg);
+    background:var(--party);
+    color:#fff;
+    border-radius:9999px;
+    padding:3px 11px;
+    font-family:var(--fonte-mono);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-left:8px;
+  }
+
+  /* ── Avisos: papel, não vidro ────────────────────────────── */
+  .aviso{
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid var(--linha);
+    font-size:13px;
+    line-height:1.6;
+    color:var(--muted);
+  }
+  .aviso strong{color:var(--ink);font-weight:600}
+
+  .rodape{
+    margin-top:22px;
+    font-family:var(--fonte-mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>📲 Baixar o VAMO 📸</h1>
-  <p class="sub">A câmera da festa — foto direto no mural do rolê 🎉</p>
-  <a class="btn apk" href="vamo.apk">🤖 Baixar Android (.apk)</a>
-  <a class="btn ipa" href="vamo.ipa">🍎 Baixar iOS (.ipa)</a>
-  <a class="btn bot" href="https://t.me/vamobrbot">🤖 Ou usa o bot, sem instalar nada</a>
-  <small>Instalação do APK exige permitir "apps desconhecidos" para o navegador — 1 vez só.<br>iOS fora da App Store exige TestFlight.</small>
-</div>
+
+<main class="folha">
+  <div class="marca">
+    <span class="gosma" aria-hidden="true"></span>
+    VAMO
+  </div>
+
+  <h1>Leve a gosma<br>para o bolso</h1>
+  <p class="sub">
+    Ela tem peso, inércia e volta ao formato sozinha. A mesma física
+    roda no site, no Telegram, no WhatsApp e no app.
+  </p>
+
+  <nav class="opcoes" aria-label="Formas de instalar">
+    <!-- O PWA primeiro: é a única opção que funciona em TODA
+         plataforma, sem loja, sem review e sem taxa. -->
+    <a class="btn principal" href="https://vamo.app/">
+      Instalar o app
+      <span class="selo">funciona em tudo</span>
+    </a>
+    <a class="btn secundario" href="vamo.apk" download>
+      Android · baixar .apk
+    </a>
+    <a class="btn fantasma" href="https://testflight.apple.com/join/vamo">
+      iPhone · abrir no TestFlight
+    </a>
+    <a class="btn fantasma" href="https://t.me/vamobrbot">
+      Ou usar o bot, sem instalar nada
+    </a>
+  </nav>
+
+  <p class="aviso">
+    <strong>Sobre o Android:</strong> instalar o APK exige permitir
+    “apps de fontes desconhecidas” para o navegador — uma vez só.<br>
+    <strong>Sobre o iPhone:</strong> fora da App Store, o caminho é o
+    TestFlight. O PWA acima funciona sem nada disso: abra no Safari,
+    toque em Compartilhar e depois em Adicionar à Tela de Início.
+  </p>
+
+  <div class="rodape">
+    <span>VAMO · Polaroid Festa</span>
+    <span>Duas cores. Nenhuma terceira matiz.</span>
+  </div>
+</main>
+
 </body>
 </html>
